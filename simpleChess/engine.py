@@ -21,6 +21,8 @@ class GameState:
         ]
         self.white_move = True  # decide what player to move
         self.move_log = []
+        self.move_func = {'p': self.get_pawn_moves, 'R': self.get_rock_moves, 'N': self.get_knight_moves, 'B': self.get_bishop_moves,
+                          'Q': self.get_queen_moves, 'K': self.get_king_moves}
 
     def make_a_move(self, move):
         self.board[move.start_row][move.start_col] = "__"
@@ -48,7 +50,7 @@ class GameState:
             + If the king is not attacked -> add move n to a list
         * return the list that contains only valid move
         """
-        pass
+        return self.gen_possible_moves()
 
     def gen_possible_moves(self):
         """
@@ -58,21 +60,60 @@ class GameState:
         for row in range(len(self.board)):
             for col in range(len(self.board[row])):
                 turn = self.board[row][col][0]  # white(w) or black(b)
-                if (turn == 'w' and self.white_move) and (turn == 'b' and not self.white_move):
+                if (turn == 'w' and self.white_move) or (turn == 'b' and not self.white_move):
                     piece = self.board[row][col][1]
-                    if piece == 'p':  # pawn (Tot)
-                        self.get_pawn_moves(turn, row, col, possible_moves)
-                    elif piece == 'R':  # rock (Xe)
-                        self.get_rock_moves(row, col, possible_moves)
-                    elif piece == 'N':  # knight (Ma)
-                        pass
-                    elif piece == 'B':  # bishop (Tuong)
-                        pass
+                    self.move_func[piece](row, col, possible_moves)
 
-    def get_pawn_moves(self, turn, row, col, moves):
-        pass
+        return possible_moves
+
+    def get_pawn_moves(self, row, col, moves):
+        if self.white_move:  # moves for white pawn
+            if self.board[row-1][col] == "__":  # empty space
+                moves.append(Move((row, col), (row-1, col), self.board))  # one block forward
+                if row == 6 and self.board[row - 2][col] == "__":  # two block forward
+                    moves.append(Move((row, col), (row - 2, col), self.board))
+            # normal capture (left)
+            if col - 1 >= 0 and self.board[row - 1][col - 1][0] == 'b':
+                moves.append(Move((row, col), (row - 1, col - 1), self.board))
+            # normal capture (right)
+            if col + 1 <= 7 and self.board[row - 1][col + 1][0] == 'b':
+                moves.append(Move((row, col), (row - 1, col + 1), self.board))
+            # todo: implement en passent capture
+            # check if the last move is eligible pawn move:
+            # last_move = self.move_log[-1]
+            # if last_move.piece_moved == "bp" \
+            #     and last_move.start_row == 1 \
+            #         and last_move.end_row == 3 and row == 3:
+            #     if last_move.end_col == col - 1 and self.board[row - 1][col - 1] == "__":  # en passent capture left
+            #         moves.append(Move((row, col), (row - 1, col - 1), self.board))
+            #     elif last_move.end_col == col + 1 and self.board[row - 1][col + 1] == "__":  # en passent capture right
+            #         moves.append(Move((row, col), (row + 1, col + 1), self.board))
+
+        elif not self.white_move:  # moves for black pawn
+            if self.board[row+1][col] == "__":  # empty space
+                moves.append(Move((row, col), (row+1, col), self.board))  # one block forward
+                if row == 1 and self.board[row + 2][col] == "__":  # two block forward
+                    moves.append(Move((row, col), (row + 2, col), self.board))
+            # normal capture (left)
+            if col - 1 >= 0 and self.board[row + 1][col - 1][0] == 'w':
+                moves.append(Move((row, col), (row + 1, col - 1), self.board))
+            # normal capture (right)
+            if col + 1 <= 7 and self.board[row + 1][col + 1][0] == 'w':
+                moves.append(Move((row, col), (row + 1, col + 1), self.board))
 
     def get_rock_moves(self, row, col, moves):
+        pass
+
+    def get_knight_moves(self, row, col, moves):
+        pass
+
+    def get_bishop_moves(self, row, col, moves):
+        pass
+
+    def get_queen_moves(self, row, col, moves):
+        pass
+
+    def get_king_moves(self, row, col, moves):
         pass
 
 
@@ -95,6 +136,14 @@ class Move:
         self.end_col = end_square[1]
         self.piece_moved = board[self.start_row][self.start_col]
         self.piece_captured = board[self.end_row][self.end_col]
+        self.move_id = self.start_row * 1000 + self.start_col * 100 + self.end_row * 10 + self.end_col
+
+    # Override equal method
+    # Compare obj with other obj
+    def __eq__(self, other):
+        if isinstance(other, Move):
+            return self.move_id == other.move_id
+        return False
 
     def get_chess_notation(self):
         return self.piece_moved + ": " + self.get_rank_file(self.start_col, self.start_row) \

@@ -97,6 +97,7 @@ def main():
                     if new_move in valid_moves:
                         gs.make_a_move(new_move)
                         print(new_move.get_chess_notation())
+                        move_made = True
 
                     # reset
                     square_selected = ()
@@ -109,7 +110,11 @@ def main():
                 # press z -> undo move
                 if e.key == pg.K_z:
                     gs.undo_move()
-                    gs.gen_valid_moves()
+                    move_made = True
+
+        if move_made:
+            gs.gen_valid_moves()
+            move_made = False
 
         draw_game_state(screen, gs)
         clk.tick(MAX_FPS)
