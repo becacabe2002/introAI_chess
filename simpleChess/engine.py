@@ -1,0 +1,101 @@
+
+class GameState:
+    """
+    * Storing all information about the current state of the game.
+    * Determining valid moves at the current state.
+    * Keeping move logs.
+    """
+    def __init__(self):
+        # b for black
+        # w for white
+        # __ for empty block
+        self.board = [
+            ["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
+            ["bp", "bp", "bp", "bp", "bp", "bp", "bp", "bp"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
+            ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]
+        ]
+        self.white_move = True  # decide what player to move
+        self.move_log = []
+
+    def make_a_move(self, move):
+        self.board[move.start_row][move.start_col] = "__"
+        self.board[move.end_row][move.end_col] = move.piece_moved
+        # save move to log list to undo if necessary
+        self.move_log.append(move)
+        # swap player
+        self.white_move = not self.white_move
+
+    def undo_move(self):
+        if len(self.move_log) != 0:  # check whether is a move performed
+            last_move = self.move_log.pop()
+            self.board[last_move.start_row][last_move.start_col] = last_move.piece_moved
+            self.board[last_move.end_row][last_move.end_col] = last_move.piece_captured
+            self.white_move = not self.white_move
+
+    def gen_valid_moves(self):
+        """
+        Generate only valid moves based on generated possible moves
+        * Get all possible move (move n):
+        * Loop through all possible move:
+            + Move piece
+            + Generate all possible move for opponent(move n.*)
+            + Check whether there are any moves that attack the king
+            + If the king is not attacked -> add move n to a list
+        * return the list that contains only valid move
+        """
+        pass
+
+    def gen_possible_moves(self):
+        """
+        Generate all possible moves based on current game state board.
+        """
+        possible_moves = []
+        for row in range(len(self.board)):
+            for col in range(len(self.board[row])):
+                turn = self.board[row][col][0]  # white(w) or black(b)
+                if (turn == 'w' and self.white_move) and (turn == 'b' and not self.white_move):
+                    piece = self.board[row][col][1]
+                    if piece == 'p':  # pawn (Tot)
+                        self.get_pawn_moves(turn, row, col, possible_moves)
+                    elif piece == 'R':  # rock (Xe)
+                        self.get_rock_moves(row, col, possible_moves)
+                    elif piece == 'N':  # knight (Ma)
+                        pass
+                    elif piece == 'B':  # bishop (Tuong)
+                        pass
+
+    def get_pawn_moves(self, turn, row, col, moves):
+        pass
+
+    def get_rock_moves(self, row, col, moves):
+        pass
+
+
+class Move:
+
+    # maps chess notation with matrix index
+    ranks_to_rows = {"1": 7, "2": 6, "3": 5, "4": 4, "5": 3, "6": 2, "7": 1, "8": 0}
+    rows_to_ranks = {v: k for k, v in ranks_to_rows.items()}
+
+    files_to_cols = {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "g": 6, "h": 7}
+    cols_to_files = {v: k for k, v in files_to_cols.items()}
+
+    def get_rank_file(self, col, row):
+        return self.cols_to_files[col] + self.rows_to_ranks[row]
+
+    def __init__(self, start_square, end_square, board):
+        self.start_row = start_square[0]
+        self.start_col = start_square[1]
+        self.end_row = end_square[0]
+        self.end_col = end_square[1]
+        self.piece_moved = board[self.start_row][self.start_col]
+        self.piece_captured = board[self.end_row][self.end_col]
+
+    def get_chess_notation(self):
+        return self.piece_moved + ": " + self.get_rank_file(self.start_col, self.start_row) \
+            + " go to " + self.get_rank_file(self.end_col, self.end_row)
