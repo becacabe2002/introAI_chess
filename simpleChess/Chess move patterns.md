@@ -6,3 +6,12 @@
     - Quân tốt có thể thực hiện "Bắt tốt qua đường" (en passant):
       - ĐK: quân tốt đối phương vừa đi 2 ô, tới vị trí ngay cạnh quân tốt của mình (theo hàng ngang)
       - Quân tốt tham gia bắt di chuyển chéo lên, ra phía sau của quân bị bắt
+    - Quân tốt sau khi đi đến hàng cuối cùng của bàn thờ có thể phong (promotion) thành bất cứ quân cờ nào khác (trừ vua)
+
+* Với **xe (rock)**:
+    - Đi hết hàng dọc, ngang
+    - Có thể ăn quân đối thủ nếu nằm trên đường đi 
+
+* Với **mã (knight)**:
+    - đi theo hình chữ L: vị trí hiện tại (r,c)
+    -> Có thể đi tới các ô (r + 2, c + 1), (r + 1, c + 2), ...

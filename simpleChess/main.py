@@ -98,10 +98,12 @@ def main():
                         gs.make_a_move(new_move)
                         print(new_move.get_chess_notation())
                         move_made = True
-
-                    # reset
-                    square_selected = ()
-                    clicks = []
+                        # reset
+                        square_selected = ()
+                        clicks = []
+                    else:
+                        # in case player click on one piece first, then click on other piece
+                        clicks = [square_selected]
                 # check if there is a second click saved in clicks -> move the piece
                 # need to check if the first click is a piece
 
@@ -113,7 +115,7 @@ def main():
                     move_made = True
 
         if move_made:
-            gs.gen_valid_moves()
+            valid_moves = gs.gen_valid_moves()
             move_made = False
 
         draw_game_state(screen, gs)
@@ -123,4 +125,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

@@ -14,7 +14,7 @@ class GameState:
             ["bp", "bp", "bp", "bp", "bp", "bp", "bp", "bp"],
             ["__", "__", "__", "__", "__", "__", "__", "__"],
             ["__", "__", "__", "__", "__", "__", "__", "__"],
-            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "wK", "__", "__", "__", "__"],
             ["__", "__", "__", "__", "__", "__", "__", "__"],
             ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
             ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]
@@ -101,20 +101,82 @@ class GameState:
             if col + 1 <= 7 and self.board[row + 1][col + 1][0] == 'w':
                 moves.append(Move((row, col), (row + 1, col + 1), self.board))
 
+            # todo: implement pawn promotions
+
     def get_rock_moves(self, row, col, moves):
-        pass
+        # rock's moving directions: forward, backward, right, lef
+        directions = ((-1,0), (1, 0), (0, 1), (0, -1))
+        enemy_color = 'b' if self.white_move else 'w'
+        for d in directions:
+            for i in range(1, 8):  # 7 block is the maximum
+                end_row = row + d[0] * i
+                end_col = col + d[1] * i
+                if 0 <= end_row < 8 and 0 <= end_col < 8:  # make sure that it is still on board
+                    end_piece = self.board[end_row][end_col]
+                    if end_piece == "__":  # empty space
+                        new_move = Move((row, col), (end_row, end_col), self.board)
+                        moves.append(new_move)
+                    elif end_piece[0] == enemy_color:  # if there is enemy on the way, capture the first one
+                        new_move = Move((row, col), (end_row, end_col), self.board)
+                        moves.append(new_move)
+                        break
+                    else:
+                        break
+                else:
+                    break
 
     def get_knight_moves(self, row, col, moves):
-        pass
+        positions = ((1, 2), (2, 1), (1, -2), (2, -1), (-1, 2), (-2, 1), (-1, -2), (-2, -1))
+        enemy_color = 'b' if self.white_move else 'w'
+        for p in positions:
+            end_row = row + p[0]
+            end_col = col + p[1]
+            if 0 <= end_row < 8 and 0 <= end_col < 8:
+                end_piece = self.board[end_row][end_col]
+                if end_piece == "__":
+                    moves.append(Move((row, col), (end_row, end_col), self.board))
+                elif end_piece[0] == enemy_color:
+                    moves.append(Move((row, col), (end_row, end_col), self.board))
+            else:
+                continue
 
     def get_bishop_moves(self, row, col, moves):
-        pass
+        directions = ((-1, -1), (-1, 1), (1, -1), (1, 1))
+        enemy_color = 'b' if self.white_move else 'w'
+        for d in directions:
+            for i in range(1, 8):  # 7 block is the maximum
+                end_row = row + d[0] * i
+                end_col = col + d[1] * i
+                if 0 <= end_row < 8 and 0 <= end_col < 8:  # make sure that it is still on board
+                    end_piece = self.board[end_row][end_col]
+                    if end_piece == "__":  # empty space
+                        new_move = Move((row, col), (end_row, end_col), self.board)
+                        moves.append(new_move)
+                    elif end_piece[0] == enemy_color:  # if there is enemy on the way, capture the first one
+                        new_move = Move((row, col), (end_row, end_col), self.board)
+                        moves.append(new_move)
+                        break
+                    else:
+                        break
+                else:
+                    break
 
     def get_queen_moves(self, row, col, moves):
-        pass
+        self.get_rock_moves(row, col, moves)
+        self.get_bishop_moves(row, col, moves)
 
     def get_king_moves(self, row, col, moves):
-        pass
+        positions = ((-1, -1), (-1, 0), (-1, 1), (1, -1), (1, 0), (1, 1), (0, -1), (0, 1))
+        ally_color = 'w' if self.white_move else 'b'
+        for p in positions:
+            end_row = row + p[0]
+            end_col = col + p[1]
+            if 0 <= end_row <8 and 0 <= end_col <8:
+                end_piece = self.board[end_row][end_col]
+                if end_piece[0] is not ally_color:
+                    moves.append(Move((row,col), (end_row, end_col), self.board))
+            else:
+                continue
 
 
 class Move:
