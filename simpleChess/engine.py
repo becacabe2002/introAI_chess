@@ -14,14 +14,20 @@ class GameState:
             ["bp", "bp", "bp", "bp", "bp", "bp", "bp", "bp"],
             ["__", "__", "__", "__", "__", "__", "__", "__"],
             ["__", "__", "__", "__", "__", "__", "__", "__"],
-            ["__", "__", "__", "wK", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
             ["__", "__", "__", "__", "__", "__", "__", "__"],
             ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
             ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]
         ]
         self.white_move = True  # decide what player to move
-        self.move_log = []
-        self.move_func = {'p': self.get_pawn_moves, 'R': self.get_rock_moves, 'N': self.get_knight_moves, 'B': self.get_bishop_moves,
+        self.move_log = []  # save made moves
+
+        # variables to keep track of king pieces (for implementing checkmate)
+        self.white_king_pos = (7, 4)  # similar to row 1, col e
+        self.black_king_pos = (0, 4)  # similar to row 8, col e
+
+        self.move_func = {'p': self.get_pawn_moves, 'R': self.get_rock_moves,
+                          'N': self.get_knight_moves, 'B': self.get_bishop_moves,
                           'Q': self.get_queen_moves, 'K': self.get_king_moves}
 
     def make_a_move(self, move):
