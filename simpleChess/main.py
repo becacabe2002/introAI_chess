@@ -5,7 +5,7 @@ Main file:
 """
 
 import pygame as pg
-from simpleChess import engine
+import engine
 
 WIDTH = HEIGHT = 512  # of the board
 DIMENSION = 8  # is a 8x8 board
@@ -125,3 +125,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+#dnt
