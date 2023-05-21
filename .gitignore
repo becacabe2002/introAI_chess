@@ -1,2 +1,2 @@
 *.pyc
-./simpleChess/.idea/*
+simpleChess/.idea/
