@@ -5,7 +5,7 @@ Main file:
 """
 
 import pygame as pg
-from simpleChess import engine
+import engine
 
 WIDTH = HEIGHT = 512  # of the board
 DIMENSION = 8  # is a 8x8 board
@@ -121,6 +121,14 @@ def main():
         draw_game_state(screen, gs)
         clk.tick(MAX_FPS)
         pg.display.flip()
+        if gs.check_mate:
+            if gs.white_move:
+                player_color = "black"
+            else:
+                player_color = "white"
+            print("Player " + player_color + " win")
+        elif gs.stale_mate:
+            print("Stale mate. Game drawn.")
 
 
 if __name__ == "__main__":

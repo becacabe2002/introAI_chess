@@ -29,6 +29,8 @@ class GameState:
         self.move_func = {'p': self.get_pawn_moves, 'R': self.get_rock_moves,
                           'N': self.get_knight_moves, 'B': self.get_bishop_moves,
                           'Q': self.get_queen_moves, 'K': self.get_king_moves}
+        self.check_mate = False  # King is in check and doesnt have any valid move -> Win
+        self.stale_mate = False  # King is not in check but doesnt have any valid move -> Draw
 
     def make_a_move(self, move):
         self.board[move.start_row][move.start_col] = "__"
@@ -37,6 +39,11 @@ class GameState:
         self.move_log.append(move)
         # swap player
         self.white_move = not self.white_move
+        # update the King position if it is moved
+        if move.piece_moved == "wK":
+            self.white_king_pos = (move.end_row, move.end_col)
+        if move.piece_moved == "bK":
+            self.black_king_pos = (move.end_row, move.end_col)
 
     def undo_move(self):
         if len(self.move_log) != 0:  # check whether is a move performed
@@ -44,6 +51,10 @@ class GameState:
             self.board[last_move.start_row][last_move.start_col] = last_move.piece_moved
             self.board[last_move.end_row][last_move.end_col] = last_move.piece_captured
             self.white_move = not self.white_move
+            if last_move.piece_moved == "wK":
+                self.white_king_pos = (last_move.start_row, last_move.start_col)
+            if last_move.piece_moved == "bK":
+                self.black_king_pos = (last_move.start_row, last_move.start_col)
 
     def gen_valid_moves(self):
         """
@@ -56,7 +67,44 @@ class GameState:
             + If the king is not attacked -> add move n to a list
         * return the list that contains only valid move
         """
-        return self.gen_possible_moves()
+
+        moves = self.gen_possible_moves()
+
+        for i in range(len(moves) -1, -1, -1):  # need to check backward for avoid shifting effect
+            self.make_a_move(moves[i])  # switch to opponent turn
+
+            # need to switch to player turn to check if the player's King is in check
+            self.white_move = not self.white_move
+            if self.is_in_check():
+                moves.remove(moves[i])
+            self.white_move = not self.white_move
+            self.undo_move()
+
+        # Update game state: checkMate and staleMate
+        if len(moves) == 0:
+            if self.is_in_check():
+                self.check_mate = True
+            else:
+                self.stale_mate = True
+        else:
+            self.check_mate = False
+            self.stale_mate = False
+        return moves
+
+    def is_in_check(self):
+        if self.white_move:
+            return self.is_square_attacked(self.white_king_pos[0], self.white_king_pos[1])
+        else:
+            return self.is_square_attacked(self.black_king_pos[0], self.black_king_pos[1])
+
+    def is_square_attacked(self, row, col):
+        self.white_move = not self.white_move
+        opponent_moves = self.gen_possible_moves() # generate all possible move of opponent
+        self.white_move = not self.white_move
+        for m in opponent_moves:
+            if m.end_row == row and m.end_col == col:
+                return True
+        return False
 
     def gen_possible_moves(self):
         """
