@@ -305,17 +305,16 @@ class GameState:
                 self.pins.remove(self.pins[i])
                 break
 
-        positions = ((1, 2), (2, 1), (1, -2), (2, -1), (-1, 2), (-2, 1), (-1, -2), (-2, -1))
-        enemy_color = 'b' if self.white_move else 'w'
+        positions = ((-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1))
+        ally_color = 'w' if self.white_move else 'b'
         for p in positions:
             end_row = row + p[0]
             end_col = col + p[1]
             if 0 <= end_row < 8 and 0 <= end_col < 8:
-                end_piece = self.board[end_row][end_col]
-                if end_piece == "__":
-                    moves.append(Move((row, col), (end_row, end_col), self.board))
-                elif end_piece[0] == enemy_color:
-                    moves.append(Move((row, col), (end_row, end_col), self.board))
+                if not piece_pinned:
+                    end_piece = self.board[end_row][end_col]
+                    if end_piece[0] != ally_color: # not an ally piece (empty or enemy piece)
+                        moves.append(Move((row, col), (end_row, end_col), self.board))
             else:
                 continue
 
