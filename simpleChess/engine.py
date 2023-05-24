@@ -72,7 +72,7 @@ class GameState:
         """
 
         moves = []
-        self.in_check, self.pins, self.checks = self.checkForPinsAndChecks()
+        self.in_check, self.pins, self.checks = self.check_pins_and_checks()
 
         if self.white_move:
             king_row = self.white_king_pos[0]
@@ -149,20 +149,20 @@ class GameState:
 
         return possible_moves
 
-    def checkForPinsAndChecks(self):
+    def check_pins_and_checks(self):
         pins = []  # squares pinned and the direction its pinned from
         checks = []  # squares where enemy is applying a check
         in_check = False
-        if self.white_to_move:
+        if self.white_move:
             enemy_color = "b"
             ally_color = "w"
-            start_row = self.white_king_location[0]
-            start_col = self.white_king_location[1]
+            start_row = self.white_king_pos[0]
+            start_col = self.white_king_pos[1]
         else:
             enemy_color = "w"
             ally_color = "b"
-            start_row = self.black_king_location[0]
-            start_col = self.black_king_location[1]
+            start_row = self.black_king_pos[0]
+            start_col = self.black_king_pos[1]
         # check outwards from king for pins and checks, keep track of pins
         directions = ((-1, 0), (0, -1), (1, 0), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1))
         for j in range(len(directions)):
@@ -295,6 +295,16 @@ class GameState:
                     break
 
     def get_knight_moves(self, row, col, moves):
+        piece_pinned = False
+        pin_direction = ()
+
+        for i in range(len(self.pins) - 1, -1, -1):
+            if self.pins[i][0] == row and self.pins[i][1] == col:
+                piece_pinned = True
+                pin_direction = (self.pins[i][2], self.pins[i][3])
+                self.pins.remove(self.pins[i])
+                break
+
         positions = ((1, 2), (2, 1), (1, -2), (2, -1), (-1, 2), (-2, 1), (-1, -2), (-2, -1))
         enemy_color = 'b' if self.white_move else 'w'
         for p in positions:
