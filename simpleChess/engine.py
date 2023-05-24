@@ -261,6 +261,17 @@ class GameState:
             # todo: implement pawn promotions
 
     def get_rook_moves(self, row, col, moves):
+        piece_pinned = False
+        pin_direction = ()
+
+        for i in range(len(self.pins) - 1, -1, -1):
+            if self.pins[i][0] == row and self.pins[i][1] == col:
+                piece_pinned = True
+                pin_direction = (self.pins[i][2], self.pins[i][3])
+                if self.board[row][col][1] != "Q":  # can't remove queen from pin on rook moves, only remove it on bishop moves
+                    self.pins.remove(self.pins[i])
+                break
+
         # rook's moving directions: forward, backward, right, lef
         directions = ((-1, 0), (1, 0), (0, 1), (0, -1))
         enemy_color = 'b' if self.white_move else 'w'
@@ -269,16 +280,17 @@ class GameState:
                 end_row = row + d[0] * i
                 end_col = col + d[1] * i
                 if 0 <= end_row < 8 and 0 <= end_col < 8:  # make sure that it is still on board
-                    end_piece = self.board[end_row][end_col]
-                    if end_piece == "__":  # empty space
-                        new_move = Move((row, col), (end_row, end_col), self.board)
-                        moves.append(new_move)
-                    elif end_piece[0] == enemy_color:  # if there is enemy on the way, capture the first one
-                        new_move = Move((row, col), (end_row, end_col), self.board)
-                        moves.append(new_move)
-                        break
-                    else:
-                        break
+                    if not piece_pinned or pin_direction == d or pin_direction == (-d[0], -d[1]):
+                        end_piece = self.board[end_row][end_col]
+                        if end_piece == "__":  # empty space
+                            new_move = Move((row, col), (end_row, end_col), self.board)
+                            moves.append(new_move)
+                        elif end_piece[0] == enemy_color:  # if there is enemy on the way, capture the first one
+                            new_move = Move((row, col), (end_row, end_col), self.board)
+                            moves.append(new_move)
+                            break
+                        else:
+                            break
                 else:
                     break
 
