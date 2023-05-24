@@ -173,7 +173,7 @@ class GameState:
                 end_col = start_col + direction[1] * i
                 if 0 <= end_row <= 7 and 0 <= end_col <= 7:
                     end_piece = self.board[end_row][end_col]
-                    if end_piece[0] == ally_color and end_piece[1] != "K":
+                    if end_piece[0] == ally_color and end_piece[1] != "K": # make sure ally piece is not king
                         if possible_pin == ():  # first allied piece could be pinned
                             possible_pin = (end_row, end_col, direction[0], direction[1])
                         else:  # 2nd allied piece - no check or pin from this direction
@@ -355,17 +355,28 @@ class GameState:
         self.get_bishop_moves(row, col, moves)
 
     def get_king_moves(self, row, col, moves):
-        positions = ((-1, -1), (-1, 0), (-1, 1), (1, -1), (1, 0), (1, 1), (0, -1), (0, 1))
-        ally_color = 'w' if self.white_move else 'b'
-        for p in positions:
-            end_row = row + p[0]
-            end_col = col + p[1]
-            if 0 <= end_row < 8 and 0 <= end_col < 8:
+        row_moves = (-1, -1, -1, 0, 0, 1, 1, 1)
+        col_moves = (-1, 0, 1, -1, 1, -1, 0, 1)
+        ally_color = "w" if self.white_move else "b"
+        for i in range(8):
+            end_row = row + row_moves[i]
+            end_col = col + col_moves[i]
+            if 0 <= end_row <= 7 and 0 <= end_col <= 7:
                 end_piece = self.board[end_row][end_col]
-                if end_piece[0] is not ally_color:
-                    moves.append(Move((row, col), (end_row, end_col), self.board))
-            else:
-                continue
+                if end_piece[0] != ally_color:  # not an ally piece - empty or enemy
+                    # place king on end square and check for checks
+                    if ally_color == "w":
+                        self.white_king_pos = (end_row, end_col)
+                    else:
+                        self.black_king_pos = (end_row, end_col)
+                    in_check, pins, checks = self.check_pins_and_checks()
+                    if not in_check:
+                        moves.append(Move((row, col), (end_row, end_col), self.board))
+                    # place king back on original location
+                    if ally_color == "w":
+                        self.white_king_pos = (row, col)
+                    else:
+                        self.black_king_pos = (row, col)
 
 
 class Move:
