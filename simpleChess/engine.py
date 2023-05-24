@@ -214,6 +214,16 @@ class GameState:
         return in_check, pins, checks
 
     def get_pawn_moves(self, row, col, moves):
+        piece_pinned = False
+        pin_direction = ()
+
+        for i in range(len(self.pins)-1, -1, -1):
+            if self.pins[i][0] == row and self.pins[i][1] == col:
+                piece_pinned = True
+                pin_direction = (self.pins[i][2], self.pins[i][3])
+                self.pins.remove(self.pins[i])
+                break
+
         if self.white_move:  # moves for white pawn
             if self.board[row - 1][col] == "__":  # empty space
                 moves.append(Move((row, col), (row - 1, col), self.board))  # one block forward
