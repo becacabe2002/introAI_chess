@@ -26,7 +26,7 @@ class GameState:
         self.white_king_pos = (7, 4)  # similar to row 1, col e
         self.black_king_pos = (0, 4)  # similar to row 8, col e
 
-        self.move_func = {'p': self.get_pawn_moves, 'R': self.get_rock_moves,
+        self.move_func = {'p': self.get_pawn_moves, 'R': self.get_rook_moves,
                           'N': self.get_knight_moves, 'B': self.get_bishop_moves,
                           'Q': self.get_queen_moves, 'K': self.get_king_moves}
         self.check_mate = False  # King is in check and doesnt have any valid move -> Win
@@ -260,8 +260,8 @@ class GameState:
 
             # todo: implement pawn promotions
 
-    def get_rock_moves(self, row, col, moves):
-        # rock's moving directions: forward, backward, right, lef
+    def get_rook_moves(self, row, col, moves):
+        # rook's moving directions: forward, backward, right, lef
         directions = ((-1, 0), (1, 0), (0, 1), (0, -1))
         enemy_color = 'b' if self.white_move else 'w'
         for d in directions:
@@ -319,7 +319,7 @@ class GameState:
                     break
 
     def get_queen_moves(self, row, col, moves):
-        self.get_rock_moves(row, col, moves)
+        self.get_rook_moves(row, col, moves)
         self.get_bishop_moves(row, col, moves)
 
     def get_king_moves(self, row, col, moves):
