@@ -95,17 +95,14 @@ class GameState:
                     valid_squares = [(check_row, check_col)]
                 else:
                     for i in range(1, 8):
-                        valid_square = (king_row + check[2] * i,
-                                        king_col + check[3] * i)  # check[2] and check[3] are the check directions
+                        valid_square = (king_row + check[2] * i, king_col + check[3] * i)  # check[2] and check[3] are the check directions
                         valid_squares.append(valid_square)
-                        if valid_square[0] == check_row and valid_square[
-                            1] == check_col:  # once you get to piece and check
+                        if valid_square[0] == check_row and valid_square[1] == check_col:  # once you get to piece and check
                             break
                 # get rid of any moves that don't block check or move king
                 for i in range(len(moves) - 1, -1, -1):  # iterate through the list backwards when removing elements
                     if moves[i].piece_moved[1] != "K":  # move doesn't move king so it must block or capture
-                        if not (moves[i].end_row,
-                                moves[i].end_col) in valid_squares:  # move doesn't block or capture piece
+                        if not (moves[i].end_row, moves[i].end_col) in valid_squares:  # move doesn't block or capture piece
                             moves.remove(moves[i])
             else:  # double check, king has to move
                 self.get_king_moves(king_row, king_col, moves)
