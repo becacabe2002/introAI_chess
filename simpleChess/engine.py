@@ -319,6 +319,16 @@ class GameState:
                 continue
 
     def get_bishop_moves(self, row, col, moves):
+        piece_pinned = False
+        pin_direction = ()
+
+        for i in range(len(self.pins) - 1, -1, -1):
+            if self.pins[i][0] == row and self.pins[i][1] == col:
+                piece_pinned = True
+                pin_direction = (self.pins[i][2], self.pins[i][3])
+                self.pins.remove(self.pins[i])
+                break
+
         directions = ((-1, -1), (-1, 1), (1, -1), (1, 1))
         enemy_color = 'b' if self.white_move else 'w'
         for d in directions:
@@ -326,17 +336,18 @@ class GameState:
                 end_row = row + d[0] * i
                 end_col = col + d[1] * i
                 if 0 <= end_row < 8 and 0 <= end_col < 8:  # make sure that it is still on board
-                    end_piece = self.board[end_row][end_col]
-                    if end_piece == "__":  # empty space
-                        new_move = Move((row, col), (end_row, end_col), self.board)
-                        moves.append(new_move)
-                    elif end_piece[0] == enemy_color:  # if there is enemy on the way, capture the first one
-                        new_move = Move((row, col), (end_row, end_col), self.board)
-                        moves.append(new_move)
-                        break
-                    else:
-                        break
-                else:
+                    if not piece_pinned or pin_direction == d or pin_direction == (-d[0], -d[1]):
+                        end_piece = self.board[end_row][end_col]
+                        if end_piece == "__":  # empty space
+                            new_move = Move((row, col), (end_row, end_col), self.board)
+                            moves.append(new_move)
+                        elif end_piece[0] == enemy_color:  # if there is enemy on the way, capture the first one
+                            new_move = Move((row, col), (end_row, end_col), self.board)
+                            moves.append(new_move)
+                            break
+                        else:
+                            break
+                else: # off board
                     break
 
     def get_queen_moves(self, row, col, moves):
