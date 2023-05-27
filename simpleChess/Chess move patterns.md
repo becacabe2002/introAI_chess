@@ -15,3 +15,4 @@
 * Với **mã (knight)**:
     - đi theo hình chữ L: vị trí hiện tại (r,c)
     -> Có thể đi tới các ô (r + 2, c + 1), (r + 1, c + 2), ...
+    git push origin feature/pawn_move_update
