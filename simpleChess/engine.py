@@ -34,6 +34,7 @@ class GameState:
         self.in_check = False
         self.pins = []
         self.checks = []
+        self.enpassant_possible = () #coordinates for the square where en passant capture is possible
 
     def make_a_move(self, move):
         self.board[move.start_row][move.start_col] = "__"
@@ -234,11 +235,17 @@ class GameState:
                 if row == 6 and self.board[row - 2][col] == "__":  # two block forward
                     moves.append(Move((row, col), (row - 2, col), self.board))
             # normal capture (left)
-            if col - 1 >= 0 and self.board[row - 1][col - 1][0] == 'b':
-                moves.append(Move((row, col), (row - 1, col - 1), self.board))
+            if col - 1 >= 0:
+                if self.board[row - 1][col - 1][0] == 'b':
+                    moves.append(Move((row, col), (row - 1, col - 1), self.board))
+                elif (row - 1, col - 1) == self.enpassant_possible:
+                    moves.append(Move((row, col), (row - 1, col - 1), self.board, is_enpassant_move=True))
             # normal capture (right)
-            if col + 1 <= 7 and self.board[row - 1][col + 1][0] == 'b':
-                moves.append(Move((row, col), (row - 1, col + 1), self.board))
+            if col + 1 <= 7:
+                if self.board[row - 1][col + 1][0] == 'b':
+                    moves.append(Move((row, col), (row - 1, col + 1), self.board))
+                elif (row - 1, col + 1) == self.enpassant_possible:
+                    moves.append(Move((row, col), (row - 1, col + 1), self.board, is_enpassant_move=True))
             # todo: implement en passent capture
             # check if the last move is eligible pawn move:
             # last_move = self.move_log[-1]
@@ -256,11 +263,17 @@ class GameState:
                 if row == 1 and self.board[row + 2][col] == "__":  # two block forward
                     moves.append(Move((row, col), (row + 2, col), self.board))
             # normal capture (left)
-            if col - 1 >= 0 and self.board[row + 1][col - 1][0] == 'w':
-                moves.append(Move((row, col), (row + 1, col - 1), self.board))
+            if col - 1 >= 0:
+                if self.board[row + 1][col - 1][0] == 'w':
+                    moves.append(Move((row, col), (row + 1, col - 1), self.board))
+                elif (row + 1, col - 1) == self.enpassant_possible:
+                    moves.append(Move((row, col), (row + 1, col - 1), self.board, is_enpassant_move=True))
             # normal capture (right)
-            if col + 1 <= 7 and self.board[row + 1][col + 1][0] == 'w':
-                moves.append(Move((row, col), (row + 1, col + 1), self.board))
+            if col + 1 <= 7:
+                if self.board[row + 1][col + 1][0] == 'w':
+                    moves.append(Move((row, col), (row + 1, col + 1), self.board))
+                elif (row + 1, col + 1) == self.enpassant_possible:
+                    moves.append(Move((row, col), (row + 1, col + 1), self.board, is_enpassant_move=True))
 
             # todo: implement pawn promotions
 
@@ -394,16 +407,18 @@ class Move:
     def get_rank_file(self, col, row):
         return self.cols_to_files[col] + self.rows_to_ranks[row]
 
-    def __init__(self, start_square, end_square, board):
+    def __init__(self, start_square, end_square, board, is_enpassant_move = False):
         self.start_row = start_square[0]
         self.start_col = start_square[1]
         self.end_row = end_square[0]
         self.end_col = end_square[1]
         self.piece_moved = board[self.start_row][self.start_col]
         self.piece_captured = board[self.end_row][self.end_col]
-        self.is_pawn_promotion = False
-        if (self.piece_moved == 'wp' and self.end_row == 0) or (self.piece_moved == 'bp' and self.end_row == 7) :
-            self.is_pawn_promotion = True
+        # pawn promotion
+        self.is_pawn_promotion = (self.piece_moved == 'wp' and self.end_row == 0) or (self.piece_moved == 'bp' and self.end_row == 7) 
+        # en passant
+        self.is_en_passant_move = is_enpassant_move
+
         self.move_id = self.start_row * 1000 + self.start_col * 100 + self.end_row * 10 + self.end_col
 
     # Override equal method
