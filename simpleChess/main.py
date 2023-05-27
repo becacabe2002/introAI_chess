@@ -94,14 +94,15 @@ def main():
                     clicks.append(square_selected)
                 if len(clicks) == 2:
                     new_move = engine.Move(clicks[0], clicks[1], gs.board)
-                    if new_move in valid_moves:
-                        gs.make_a_move(new_move)
-                        print(new_move.get_chess_notation())
-                        move_made = True
-                        # reset
-                        square_selected = ()
-                        clicks = []
-                    else:
+                    for i in range(len(valid_moves)):
+                        if new_move == valid_moves[i]:
+                            gs.make_a_move(valid_moves[i])
+                            print(new_move.get_chess_notation())
+                            move_made = True
+                            # reset
+                            square_selected = ()
+                            clicks = []
+                    if not move_made:
                         # in case player click on one piece first, then click on other piece
                         clicks = [square_selected]
                 # check if there is a second click saved in clicks -> move the piece

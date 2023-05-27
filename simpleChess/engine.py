@@ -397,6 +397,9 @@ class Move:
         self.end_col = end_square[1]
         self.piece_moved = board[self.start_row][self.start_col]
         self.piece_captured = board[self.end_row][self.end_col]
+        self.is_pawn_promotion = False
+        if (self.piece_moved == 'wp' and self.endRow == 0) or (self.piece_moved == 'bp' and self.endRow == 7):
+            self.is_pawn_promotion = True
         self.move_id = self.start_row * 1000 + self.start_col * 100 + self.end_row * 10 + self.end_col
 
     # Override equal method
