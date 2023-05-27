@@ -51,6 +51,7 @@ class GameState:
         # pawn promotion
         if move.is_pawn_promotion:
             self.board[move.end_row][move.end_col] = move.piece_moved[0] + 'Q'
+
     def undo_move(self):
         if len(self.move_log) != 0:  # check whether is a move performed
             last_move = self.move_log.pop()
@@ -401,8 +402,7 @@ class Move:
         self.piece_moved = board[self.start_row][self.start_col]
         self.piece_captured = board[self.end_row][self.end_col]
         self.is_pawn_promotion = False
-        # self.promotion_choice = 'Q'
-        if (self.piece_moved == 'wp' and self.endRow == 0) or (self.piece_moved == 'bp' and self.endRow == 7):
+        if (self.piece_moved == 'wp' and self.end_row == 0) or (self.piece_moved == 'bp' and self.end_row == 7) :
             self.is_pawn_promotion = True
         self.move_id = self.start_row * 1000 + self.start_col * 100 + self.end_row * 10 + self.end_col
 
