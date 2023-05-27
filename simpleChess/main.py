@@ -94,10 +94,10 @@ def main():
                     clicks.append(square_selected)
                 if len(clicks) == 2:
                     new_move = engine.Move(clicks[0], clicks[1], gs.board)
+                    print(new_move.get_chess_notation())
                     for i in range(len(valid_moves)):
                         if new_move == valid_moves[i]:
                             gs.make_a_move(valid_moves[i])
-                            print(new_move.get_chess_notation())
                             move_made = True
                             # reset
                             square_selected = ()
