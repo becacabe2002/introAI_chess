@@ -15,3 +15,7 @@
 * Với **mã (knight)**:
     - đi theo hình chữ L: vị trí hiện tại (r,c)
     -> Có thể đi tới các ô (r + 2, c + 1), (r + 1, c + 2), ...
+* Lưu ý: 
+    - git push origin feature/pawn_move_update
+    - Cách đặt tên biến: snake_case instead of camelCase
+    - king_pos instead of king_location

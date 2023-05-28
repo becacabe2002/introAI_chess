@@ -34,6 +34,7 @@ class GameState:
         self.in_check = False
         self.pins = []
         self.checks = []
+        self.enpassant_possible = () #coordinates for the square where en passant capture is possible
 
     def make_a_move(self, move):
         self.board[move.start_row][move.start_col] = "__"
@@ -48,6 +49,21 @@ class GameState:
         if move.piece_moved == "bK":
             self.black_king_pos = (move.end_row, move.end_col)
 
+        # pawn promotion
+        if move.is_pawn_promotion:
+            self.board[move.end_row][move.end_col] = move.piece_moved[0] + 'Q'
+
+        # enpassant move
+        if move.is_enpassant_move:
+            self.board[move.start_row][move.end_col] = "__" #capturing the pawn
+        
+        #update enpassant_possible variable
+        if move.piece_moved[1] == 'p' and abs(move.start_row - move.end_row) == 2: #only on 2 squre pawn advances
+            self.enpassant_possible = ((move.start_row + move.end_row)//2, move.start_col)
+        else:
+            self.enpassant_possible = ()
+
+
     def undo_move(self):
         if len(self.move_log) != 0:  # check whether is a move performed
             last_move = self.move_log.pop()
@@ -58,8 +74,17 @@ class GameState:
                 self.white_king_pos = (last_move.start_row, last_move.start_col)
             if last_move.piece_moved == "bK":
                 self.black_king_pos = (last_move.start_row, last_move.start_col)
+            # undo en passant
+            if  last_move.is_enpassant_move:
+                self.board[last_move.end_row][last_move.end_col] = '__' #leave landing square blank
+                self.board[last_move.start_row][last_move.end_col] =  last_move.piece_captured
+                self.enpassant_possible = (last_move.end_row, last_move.end_col)
+            # undo a 2 square pawn advance
+            if last_move.piece_moved[1] == 'p' and abs(last_move.start_row - last_move.end_row) == 2:
+                self.enpassant_possible = ()
 
     def gen_valid_moves(self):
+        temp_enpassant_possible = self.enpassant_possible
         """
         Generate only valid moves based on generated possible moves
         * Get all possible move (move n):
@@ -118,6 +143,7 @@ class GameState:
         else:
             self.check_mate = False
             self.stale_mate = False
+        self.enpassant_possible = temp_enpassant_possible 
         return moves
 
     def is_in_check(self):
@@ -230,11 +256,17 @@ class GameState:
                 if row == 6 and self.board[row - 2][col] == "__":  # two block forward
                     moves.append(Move((row, col), (row - 2, col), self.board))
             # normal capture (left)
-            if col - 1 >= 0 and self.board[row - 1][col - 1][0] == 'b':
-                moves.append(Move((row, col), (row - 1, col - 1), self.board))
+            if col - 1 >= 0:
+                if self.board[row - 1][col - 1][0] == 'b':
+                    moves.append(Move((row, col), (row - 1, col - 1), self.board))
+                elif (row - 1, col - 1) == self.enpassant_possible:
+                    moves.append(Move((row, col), (row - 1, col - 1), self.board, is_enpassant_move=True))
             # normal capture (right)
-            if col + 1 <= 7 and self.board[row - 1][col + 1][0] == 'b':
-                moves.append(Move((row, col), (row - 1, col + 1), self.board))
+            if col + 1 <= 7:
+                if self.board[row - 1][col + 1][0] == 'b':
+                    moves.append(Move((row, col), (row - 1, col + 1), self.board))
+                elif (row - 1, col + 1) == self.enpassant_possible:
+                    moves.append(Move((row, col), (row - 1, col + 1), self.board, is_enpassant_move=True))
             # todo: implement en passent capture
             # check if the last move is eligible pawn move:
             # last_move = self.move_log[-1]
@@ -252,11 +284,17 @@ class GameState:
                 if row == 1 and self.board[row + 2][col] == "__":  # two block forward
                     moves.append(Move((row, col), (row + 2, col), self.board))
             # normal capture (left)
-            if col - 1 >= 0 and self.board[row + 1][col - 1][0] == 'w':
-                moves.append(Move((row, col), (row + 1, col - 1), self.board))
+            if col - 1 >= 0:
+                if self.board[row + 1][col - 1][0] == 'w':
+                    moves.append(Move((row, col), (row + 1, col - 1), self.board))
+                elif (row + 1, col - 1) == self.enpassant_possible:
+                    moves.append(Move((row, col), (row + 1, col - 1), self.board, is_enpassant_move=True))
             # normal capture (right)
-            if col + 1 <= 7 and self.board[row + 1][col + 1][0] == 'w':
-                moves.append(Move((row, col), (row + 1, col + 1), self.board))
+            if col + 1 <= 7:
+                if self.board[row + 1][col + 1][0] == 'w':
+                    moves.append(Move((row, col), (row + 1, col + 1), self.board))
+                elif (row + 1, col + 1) == self.enpassant_possible:
+                    moves.append(Move((row, col), (row + 1, col + 1), self.board, is_enpassant_move=True))
 
             # todo: implement pawn promotions
 
@@ -390,16 +428,20 @@ class Move:
     def get_rank_file(self, col, row):
         return self.cols_to_files[col] + self.rows_to_ranks[row]
 
-    def __init__(self, start_square, end_square, board):
+    def __init__(self, start_square, end_square, board, is_enpassant_move = False):
         self.start_row = start_square[0]
         self.start_col = start_square[1]
         self.end_row = end_square[0]
         self.end_col = end_square[1]
         self.piece_moved = board[self.start_row][self.start_col]
         self.piece_captured = board[self.end_row][self.end_col]
-        self.is_pawn_promotion = False
-        if (self.piece_moved == 'wp' and self.endRow == 0) or (self.piece_moved == 'bp' and self.endRow == 7):
-            self.is_pawn_promotion = True
+        # pawn promotion
+        self.is_pawn_promotion = (self.piece_moved == 'wp' and self.end_row == 0) or (self.piece_moved == 'bp' and self.end_row == 7) 
+        # en passant
+        self.is_enpassant_move = is_enpassant_move
+        if self.is_enpassant_move:
+            self.piece_captured = 'wp' if self.piece_moved == 'bp' else 'bp'
+
         self.move_id = self.start_row * 1000 + self.start_col * 100 + self.end_row * 10 + self.end_col
 
     # Override equal method
