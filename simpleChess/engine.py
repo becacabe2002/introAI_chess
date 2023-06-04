@@ -136,9 +136,11 @@ class GameState:
                     self.currentCastlingRight.bks = False
 
     def gen_valid_moves(self):
+        # since generate possible moves can change the enpassant_possible and castle_right of the current game state,
+        # we have to store an origin copy of them for future restoration
         temp_enpassant_possible = self.enpassant_possible
         tempCastleRights = CastleRights(self.currentCastlingRight.wks, self.currentCastlingRight.bks,
-                                        self.currentCastlingRight.wqs, self.currentCastlingRight.bqs) #copy the current castling right
+                                        self.currentCastlingRight.wqs, self.currentCastlingRight.bqs)
         """
         Generate only valid moves based on generated possible moves
         * Get all possible move (move n):
@@ -151,6 +153,7 @@ class GameState:
         """
 
         moves = []
+        # since the CastleMoves is seperated from the KingMoves, we have to call it
         if self.white_move:
             self.getCastleMoves(self.white_king_pos[0], self.white_king_pos[1], moves)
         else:
@@ -474,7 +477,7 @@ class GameState:
                         self.white_king_pos = (row, col)
                     else:
                         self.black_king_pos = (row, col)
-        self.getCastleMoves(row, col, moves)
+        # self.getCastleMoves(row, col, moves)
     '''
     Generate all valid castle moves for the king at (row, col) and add them to the list of moves
     '''
