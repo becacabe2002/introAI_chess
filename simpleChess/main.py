@@ -5,7 +5,7 @@ Displaying current GameStatus object.
 '''
 
 import pygame as p
-import ChessEngine
+import engine
 import sys
 
 WIDTH = HEIGHT = 512
@@ -18,7 +18,7 @@ MAX_FPS = 15
 IMAGES = {}
 
 
-def loadImages():
+def load_images():
     '''
     Initialize a global directory of images.
     This will be called exactly once in the main.
@@ -37,11 +37,11 @@ def main():
     screen = p.display.set_mode((WIDTH, HEIGHT))
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
-    game_state = ChessEngine.GameState()
-    valid_moves = game_state.getValidMoves()
+    game_state = engine.GameState()
+    valid_moves = game_state.get_valid_moves()
     move_made = False #flag variable for when a move is made
     
-    loadImages() #do this only once before while loop
+    load_images() #do this only once before while loop
     
     running = True
     square_selected = () #no square is selected initially, this will keep track of the last click of the user (tuple(row,col))
@@ -65,11 +65,11 @@ def main():
                     square_selected = (row, col)
                     player_clicks.append(square_selected) #append for both 1st and 2nd click
                 if len(player_clicks) == 2: #after 2nd click                                                                    
-                    move = ChessEngine.Move(player_clicks[0], player_clicks[1], game_state.board)  
+                    move = engine.Move(player_clicks[0], player_clicks[1], game_state.board)
                     for i in range(len(valid_moves)):
                         if move == valid_moves[i]:
                             print(move.getChessNotation()) 
-                            game_state.makeMove(valid_moves[i])
+                            game_state.make_move(valid_moves[i])
                             move_made = True
                             square_selected = () #reset user clicks
                             player_clicks = [] 
@@ -78,29 +78,29 @@ def main():
             #key handler
             elif e.type == p.KEYDOWN:
                 if e.key == p.K_z: #undo when 'z' is pressed
-                    game_state.undoMove()
+                    game_state.undo_move()
                     move_made = True
                     
         if move_made:
-            valid_moves = game_state.getValidMoves()
+            valid_moves = game_state.get_valid_moves()
             move_made = False
                     
                             
-        drawGameState(screen, game_state) 
+        draw_game_state(screen, game_state)
         clock.tick(MAX_FPS)
         p.display.flip()
 
 
-def drawGameState(screen, game_state):
+def draw_game_state(screen, game_state):
     '''
     Responsible for all the graphics within current game state.
     '''
-    drawBoard(screen) #draw squares on the board
+    draw_board(screen) #draw squares on the board
     #add in piece highlighting or move suggestions (later)
-    drawPieces(screen, game_state.board) #draw pieces on top of those squares      
+    draw_pieces(screen, game_state.board) #draw pieces on top of those squares
 
 
-def drawBoard(screen):
+def draw_board(screen):
     '''
     Draw the squares on the board.
     The top left square is always light.
@@ -112,7 +112,7 @@ def drawBoard(screen):
             p.draw.rect(screen, color, p.Rect(column*SQUARE_SIZE, row*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
     
 
-def drawPieces(screen, board):
+def draw_pieces(screen, board):
     '''
     Draw the pieces on the board using the current game_state.board
     '''
