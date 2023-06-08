@@ -202,7 +202,7 @@ class GameState():
                 self.get_castle_moves(self.black_king_location[0], self.black_king_location[1], moves)
 
         if len(moves) == 0:
-            if self.in_check():
+            if self.in_check:
                 self.check_mate = True
             else:
                 self.stale_mate = True
