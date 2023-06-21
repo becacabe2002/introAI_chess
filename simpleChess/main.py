@@ -49,7 +49,7 @@ def main():
     player_clicks = []  # this will keep track of player clicks (two tuples)
     game_over = False
 
-    player_one = False # if a human is playing white, then True, else False
+    player_one = True # if a human is playing white, then True, else False
     player_two = False # same as above but for black
 
     while running:
