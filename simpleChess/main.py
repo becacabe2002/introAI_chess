@@ -5,7 +5,7 @@ Displaying current GameStatus object.
 """
 
 import pygame as p
-import engine
+import engine, ai_moves
 import sys
 
 WIDTH = HEIGHT = 512
@@ -49,7 +49,12 @@ def main():
     player_clicks = []  # this will keep track of player clicks (two tuples)
     game_over = False
 
+    player_one = False # if a human is playing white, then True, else False
+    player_two = False # same as above but for black
+
     while running:
+        human_turn = (game_state.white_to_move and player_one) or (not game_state.white_to_move and player_two)
+
         for e in p.event.get():  
             if e.type == p.QUIT:
                 running = False
@@ -57,7 +62,7 @@ def main():
                 sys.exit()
             # mouse handler
             elif e.type == p.MOUSEBUTTONDOWN:
-                if not game_over:
+                if not game_over and human_turn:
                     location = p.mouse.get_pos()  # (x, y) location of the mouse
                     col = location[0] // SQUARE_SIZE
                     row = location[1] // SQUARE_SIZE
@@ -92,7 +97,14 @@ def main():
                     animate = False
                     square_selected = ()
                     player_clicks = []
-                    
+                
+        # AI move finder
+        if not game_over and not human_turn:
+            ai_move = ai_moves.find_random_move(valid_moves)
+            game_state.make_move(ai_move)
+            move_made = True
+            animate = True
+
         if move_made:
             if animate:
                 animate_move(game_state.move_log[-1], screen, game_state.board, clock)
