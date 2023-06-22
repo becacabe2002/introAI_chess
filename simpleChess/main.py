@@ -90,11 +90,13 @@ def main():
                     game_state.undo_move()
                     move_made = True
                     animate = False
+                    game_over = False
                 if e.key == p.K_r:  # reset the board when 'r' is pressed
                     game_state = engine.GameState()
                     valid_moves = game_state.get_valid_moves()
                     move_made = False
                     animate = False
+                    game_over = False
                     square_selected = ()
                     player_clicks = []
                 
