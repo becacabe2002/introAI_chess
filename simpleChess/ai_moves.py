@@ -5,6 +5,7 @@ piece_score = {"K": 0, "Q": 9, "R": 5, "B": 3,
 
 CHECKMATE = 1000
 STALEMATE = 0
+DEPTH = 3
 
 
 def find_best_move(game_state, valid_moves):
@@ -42,6 +43,71 @@ def find_best_move(game_state, valid_moves):
             best_player_move = player_move
         game_state.undo_move()
     return best_player_move
+
+
+def find_best_move_minmax(game_state, valid_moves):
+    """
+    Helper method to make first recursive call
+    """
+    global next_move
+    next_move = None
+    find_move_minmax(game_state, valid_moves, DEPTH, game_state.white_to_move)
+    return next_move
+
+
+def find_move_minmax(game_state, valid_moves, depth, white_to_move):
+    global next_move
+    if depth == 0:
+        return score_material(game_state.board)
+
+    if white_to_move:
+        max_score = -CHECKMATE
+        for move in valid_moves:
+            game_state.make_move(move)
+            next_moves = game_state.get_valid_moves()
+            score = find_move_minmax(game_state, next_moves, depth - 1, False)
+            # search all possibilities down below the depth
+            # to find the best score at that point
+            if score > max_score:
+                max_score = score
+                if depth == DEPTH:
+                    next_move =  move
+            game_state.undo_move()
+        return max_score # recursion back up
+    else:
+        min_score = CHECKMATE    
+        for move in valid_moves:
+            game_state.make_move(move)
+            next_moves = game_state.get_valid_moves()
+            score = find_move_minmax(game_state, next_moves, depth - 1, True)    
+            if score < min_score:
+                min_score = score
+                if depth == DEPTH:
+                    next_move = move
+            game_state.undo_move()
+        return min_score
+
+
+def score_board(game_state):
+    """
+    A positive score is good for white, a negative score is good for black
+    """
+    if game_state.check_mate:
+        if game_state.white_to_move:
+            return -CHECKMATE  # black wins
+        else:
+            return CHECKMATE  # white wins
+    elif game_state.stale_mate:
+        return STALEMATE  # neither side wins
+
+    score = 0
+    for row in game_state.board:
+        for square in row:
+            if square[0] == 'w':
+                score += piece_score[square[1]]
+            elif square[0] == 'b':
+                score -= piece_score[square[1]]
+    return score
 
 
 def score_material(board):
