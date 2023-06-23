@@ -45,13 +45,15 @@ def find_best_move(game_state, valid_moves):
     return best_player_move
 
 
-def find_best_move_minmax(game_state, valid_moves):
+def find_best_move(game_state, valid_moves):
     """
     Helper method to make first recursive call
     """
     global next_move
     next_move = None
-    find_move_minmax(game_state, valid_moves, DEPTH, game_state.white_to_move)
+    random.shuffle(valid_moves)
+    #find_move_minmax(game_state, valid_moves, DEPTH, game_state.white_to_move)
+    find_move_nega_max(game_state, valid_moves, DEPTH, 1 if game_state.white_to_move else -1)
     return next_move
 
 
@@ -86,6 +88,23 @@ def find_move_minmax(game_state, valid_moves, depth, white_to_move):
                     next_move = move
             game_state.undo_move()
         return min_score
+
+def find_move_nega_max(game_state, valid_moves, depth, turn_multiplier):
+    global next_move
+    if depth ==0:
+        return turn_multiplier + score_board(game_state)
+    
+    max_score =-CHECKMATE
+    for move in valid_moves:
+        game_state.make_move(move)
+        next_moves = game_state.get_valid_moves()
+        score = -find_move_nega_max(game_state, next_moves, depth -1, -turn_multiplier)
+        if score > max_score:
+            max_score = score
+            if depth == DEPTH:
+                next_move = move
+        game_state.undo_move()
+    return max_score
 
 
 def score_board(game_state):

@@ -102,7 +102,7 @@ def main():
                 
         # AI move finder
         if not game_over and not human_turn:
-            ai_move = ai_moves.find_best_move_minmax(game_state, valid_moves)
+            ai_move = ai_moves.find_best_move(game_state, valid_moves)
             if ai_move is None:
                 ai_move = ai_moves.find_random_move(valid_moves)
             game_state.make_move(ai_move)
