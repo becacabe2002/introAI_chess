@@ -1,3 +1,17 @@
+### Bản chất của hàm evaluation Stockfish
+- Là hàm đánh giá theo hướng tiếp cận heuristically, xác định giá trị liên quan tới thế cờ trong một trường hợp tổng quát, khi không có một sự đánh giá chuyên biệt hoặc tablebase (các thế tàn cuộc). 
+- Không đánh giá các thế cờ mà trong đó quân vua của một trong hai bên bị chiếu.
+- Kết quả cuối cùng được tạo bởi sự kết hợp của **Đánh giá trung cuộc (Middle game Evaluation)** và **Đánh giá tàn cuộc (End game Evaluation)**.
+  - Sử dụng ***Tapered Eval*** để có được sự chuyển giao mượt mà giữa các phase của một ván đấu.
+  - Sử dụng **Scale Factor** được sử dụng để giảm thiểu **Đánh giá tàn cuộc**
+
+> _**Tapered Eval** là như thế nào ?_
+
+* Là kĩ thuật được sử dụng để tạo sự chuyển giao mượt mà giữa các phase của một ván cờ bằng việc sử dụng giá trị số cụ thể và chi tiết của phase của game, tính tới các loại quân cờ đã bị chiếm giữ tính tới thời điểm hiện tại.
+* Kĩ thuật yêu cầu kết hợp hai giá trị phân biệt của thế cờ, với định lượng ứng với khai cuộc và tàn cuộc.
+  * Phase hiện tại của ván đấu được sử dụng để nội suy (interpolate) giữa các giá trị này
+
+**-> Giảm sự gián đoạn giữa các giai đoạn evaluation.**
 
 > *Vì sao cần có `Tempo Bonus` ?*
 
