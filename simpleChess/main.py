@@ -5,7 +5,7 @@ Displaying current GameStatus object.
 """
 
 import pygame as p
-import engine, ai_moves
+import engine, ai_moves, menu
 import sys
 
 WIDTH = HEIGHT = 512
@@ -35,6 +35,8 @@ def main():
     """
     p.init()
     screen = p.display.set_mode((WIDTH, HEIGHT))
+    chess_menu = menu.ChessMenu(WIDTH, HEIGHT, screen)
+    chess_menu.show_main_menu()
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
     game_state = engine.GameState()
@@ -50,7 +52,7 @@ def main():
     game_over = False
 
     player_one = True # if a human is playing white, then True, else False
-    player_two = False # same as above but for black
+    player_two = True # same as above but for black
 
     while running:
         human_turn = (game_state.white_to_move and player_one) or (not game_state.white_to_move and player_two)
