@@ -55,7 +55,8 @@ class GameState:
             
         # pawn promotion
         if move.is_pawn_promotion:
-            promoted_piece = input("Promote to Q, R, B, or N:")  # take this to UI later
+            # promoted_piece = input("Promote to Q, R, B, or N:")  # take this to UI later
+            promoted_piece = 'Q'
             self.board[move.end_row][move.end_col] = move.piece_moved[0] + promoted_piece
             
         # enpassant move

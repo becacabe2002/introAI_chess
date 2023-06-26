@@ -35,7 +35,7 @@ def main():
     """
     p.init()
     screen = p.display.set_mode((WIDTH, HEIGHT))
-    chess_menu = menu.ChessMenu(WIDTH, HEIGHT, screen)
+    chess_menu = menu.ChessMenu(WIDTH, HEIGHT, screen, p.event.get)
     chess_menu.show_main_menu()
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
@@ -51,8 +51,21 @@ def main():
     player_clicks = []  # this will keep track of player clicks (two tuples)
     game_over = False
 
-    player_one = True # if a human is playing white, then True, else False
-    player_two = True # same as above but for black
+    chosen_algorithm = chess_menu.algorithm 
+    chosen_depth = chess_menu.depth
+
+    player_one = True # if a human is playing white, then True, else False, default value is True
+    player_two = True # same as above but for black, default value is True
+
+    if chess_menu.mode == 'hvh':
+        player_one = True # if a human is playing white, then True, else False
+        player_two = True # same as above but for black
+    elif chess_menu.mode == 'hva':
+        player_one = True
+        player_two = False
+    elif chess_menu.mode == 'ava':
+        player_one = False
+        player_two = False
 
     while running:
         human_turn = (game_state.white_to_move and player_one) or (not game_state.white_to_move and player_two)
@@ -104,7 +117,7 @@ def main():
                 
         # AI move finder
         if not game_over and not human_turn:
-            ai_move = ai_moves.find_best_move(game_state, valid_moves)
+            ai_move = ai_moves.find_best_move(game_state, valid_moves, chosen_depth, chosen_algorithm)
             if ai_move is None:
                 ai_move = ai_moves.find_random_move(valid_moves)
             game_state.make_move(ai_move)
