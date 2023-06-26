@@ -5,7 +5,7 @@ Displaying current GameStatus object.
 """
 
 import pygame as p
-import engine
+import engine, ai_moves, menu
 import sys
 
 WIDTH = HEIGHT = 512
@@ -35,6 +35,8 @@ def main():
     """
     p.init()
     screen = p.display.set_mode((WIDTH, HEIGHT))
+    chess_menu = menu.ChessMenu(WIDTH, HEIGHT, screen, p.event.get)
+    chess_menu.show_main_menu()
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
     game_state = engine.GameState()
@@ -49,7 +51,25 @@ def main():
     player_clicks = []  # this will keep track of player clicks (two tuples)
     game_over = False
 
+    chosen_algorithm = chess_menu.algorithm 
+    chosen_depth = chess_menu.depth
+
+    player_one = True # if a human is playing white, then True, else False, default value is True
+    player_two = True # same as above but for black, default value is True
+
+    if chess_menu.mode == 'hvh':
+        player_one = True # if a human is playing white, then True, else False
+        player_two = True # same as above but for black
+    elif chess_menu.mode == 'hva':
+        player_one = True
+        player_two = False
+    elif chess_menu.mode == 'ava':
+        player_one = False
+        player_two = False
+
     while running:
+        human_turn = (game_state.white_to_move and player_one) or (not game_state.white_to_move and player_two)
+
         for e in p.event.get():  
             if e.type == p.QUIT:
                 running = False
@@ -57,7 +77,7 @@ def main():
                 sys.exit()
             # mouse handler
             elif e.type == p.MOUSEBUTTONDOWN:
-                if not game_over:
+                if not game_over and human_turn:
                     location = p.mouse.get_pos()  # (x, y) location of the mouse
                     col = location[0] // SQUARE_SIZE
                     row = location[1] // SQUARE_SIZE
@@ -85,14 +105,25 @@ def main():
                     game_state.undo_move()
                     move_made = True
                     animate = False
+                    game_over = False
                 if e.key == p.K_r:  # reset the board when 'r' is pressed
                     game_state = engine.GameState()
                     valid_moves = game_state.get_valid_moves()
                     move_made = False
                     animate = False
+                    game_over = False
                     square_selected = ()
                     player_clicks = []
-                    
+                
+        # AI move finder
+        if not game_over and not human_turn:
+            ai_move = ai_moves.find_best_move(game_state, valid_moves, chosen_depth, chosen_algorithm)
+            if ai_move is None:
+                ai_move = ai_moves.find_random_move(valid_moves)
+            game_state.make_move(ai_move)
+            move_made = True
+            animate = True
+
         if move_made:
             if animate:
                 animate_move(game_state.move_log[-1], screen, game_state.board, clock)

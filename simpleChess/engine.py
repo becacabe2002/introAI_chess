@@ -55,7 +55,8 @@ class GameState:
             
         # pawn promotion
         if move.is_pawn_promotion:
-            promoted_piece = input("Promote to Q, R, B, or N:")  # take this to UI later
+            # promoted_piece = input("Promote to Q, R, B, or N:")  # take this to UI later
+            promoted_piece = 'Q'
             self.board[move.end_row][move.end_col] = move.piece_moved[0] + promoted_piece
             
         # enpassant move
@@ -118,6 +119,10 @@ class GameState:
                 else:  # queen side
                     self.board[move.end_row][move.end_col-2] = self.board[move.end_row][move.end_col+1]
                     self.board[move.end_row][move.end_col+1] = '--'
+            
+            # anytime we undo a move, we can't be in checkmate or stalemate
+            self.check_mate = False
+            self.stale_mate = False
 
     def update_castle_rights(self, move):
         """
