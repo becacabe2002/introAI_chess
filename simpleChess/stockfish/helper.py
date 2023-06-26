@@ -1,13 +1,13 @@
-from evaluate import GameState, Global, Material, Eval, Square, CastleRights
+from evaluate import *
 from engine import GameState, CastleRights, Move
-
+from global_func import Global
 
 class Helper:
     @staticmethod
     def bishop_count(game_state, square=None, param=None):
         if square is None:
             return Global.sum(game_state, Helper.bishop_count)
-        if game_state.board[square.row][square.col] == "wB":
+        if Global.get_piece(game_state, square.row, square.col) == "wB":
             return 1
         return 0
 
@@ -15,7 +15,7 @@ class Helper:
     def queen_count(game_state, square=None, param=None):
         if square is None:
             return Global.sum(game_state, Helper.queen_count)
-        if game_state.board[square.row][square.col] == "wQ":
+        if Global.get_piece(game_state, square.row, square.col) == "wQ":
             return 1
         return
 
@@ -23,7 +23,7 @@ class Helper:
     def knight_count(game_state, square=None, param=None):
         if square is None:
             return Global.sum(game_state, Helper.knight_count)
-        if game_state.board[square.row][square.col] == "wN":
+        if Global.get_piece(game_state, square.row, square.col) == "wN":
             return 1
         return 0
 
@@ -31,7 +31,7 @@ class Helper:
     def rook_count(game_state, square=None, param=None):
         if square is None:
             return Global.sum(game_state, Helper.rook_count)
-        if game_state.board[square.row][square.col] == "wR":
+        if Global.get_piece(game_state, square.row, square.col) == "wR":
             return 1
         return 0
 
@@ -39,7 +39,7 @@ class Helper:
     def pawn_count(game_state, square=None, param=None):
         if square is None:
             return Global.sum(game_state, Helper.pawn_count)
-        if game_state.board[square.row][square.col] == "wp":
+        if Global.get_piece(game_state, square.row, square.col) == "wp":
             return 1
         return 0
 
@@ -59,9 +59,9 @@ class Helper:
         color = [0, 0]
         for i in range(8):
             for j in range(8):
-                if game_state.board[i][j] == 'wB':
+                if Global.get_piece(game_state, i, j) == 'wB':
                     color[0] = (i + j) % 2
-                if game_state.board[i][j] == 'bB':
+                if Global.get_piece(game_state, i, j) == 'bB':
                     color[1] = (i + j) % 2
         # if color[0] == color[1] -> bishop in the same color
         return False if color[0] == color[1] else True

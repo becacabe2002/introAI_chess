@@ -1,6 +1,7 @@
 from engine import *
 from evaluate import *
 from helper import *
+from global_func import Global
 
 class Imbalance:
     @staticmethod
@@ -37,14 +38,14 @@ class Imbalance:
         ]
         # wx and wb for place-holder
         piece_types = ("wx", "wp", "wN", "wB", "wR", "wQ", "bx", "bp", "bN", "bB", "bR", "bQ")
-        j = piece_types.index(game_state.board[square.row][square.col])
+        j = Global.index_of(piece_types, Global.get_piece(game_state, square.row, square.col))
         if j < 0 or j > 5:
             return 0
         bishops = [0,0]
         v = 0.0
         for x in range(8):
             for y in range(8):
-                i = piece_types.index(game_state.board[y][x])
+                i = Global.index_of(piece_types, Global.get_piece(game_state, y, x))
                 if i < 0: continue
                 if i == 9:
                     bishops[0] += 1

@@ -1,5 +1,7 @@
 from evaluate import *
 from engine import *
+from global_func import Global
+
 
 class Pawn:
 
@@ -7,12 +9,12 @@ class Pawn:
     def isolated(game_state, square=None, param=None):
         if square is None:
             return Global.sum(game_state, Pawn.isolated)
-        if game_state.board[square.row][square.col] != "wp":
+        if Global.get_piece(game_state, square.row, square.col) != "wp":
             return 0
         for i in range(8):
-            if game_state.board[i][square.col - 1] == "wp":
+            if Global.get_piece(game_state, i, square.col - 1) == "wp":
                 return 0
-            if game_state.board[i][square.col + 1] == "wp":
+            if Global.get_piece(game_state, i, square.col + 1) == "wp":
                 return 0
 
         return 1
@@ -21,10 +23,10 @@ class Pawn:
     def opposed(game_state, square=None, param=None):
         if square is None:
             return Global.sum(game_state, Pawn.opposed)
-        if game_state.board[square.row][square.col] != "wp":
+        if Global.get_piece(game_state, square.row, square.col) != "wp":
             return 0
         for i in range(square.row):
-            if game_state.board[i][square.col] == "bp":
+            if Global.get_piece(game_state, i, square.col) == "bp":
                 return 1
         return 0
 
@@ -32,11 +34,11 @@ class Pawn:
     def phalanx(game_state, square=None, param=None):
         if square is None:
             return Global.sum(game_state, Pawn.phalanx)
-        if game_state.board[square.row][square.col] != "wp":
+        if Global.get_piece(game_state, square.row, square.col) != "wp":
             return 0
-        if game_state.board[square.row][square.col - 1] == "wp":
+        if Global.get_piece(game_state, square.row, square.col - 1) == "wp":
             return 1
-        if game_state.board[square.row][square.col + 1] == "wp":
+        if Global.get_piece(game_state, square.row, square.col + 1) == "wp":
             return 1
         return 0
 
@@ -44,16 +46,16 @@ class Pawn:
     def backward(game_state, square=None, param=None):
         if square is None:
             return Global.sum(game_state, Pawn.backward)
-        if game_state.board[square.row][square.col] != "wp":
+        if Global.get_piece(game_state, square.row, square.col) != "wp":
             return 0
         for j in range(square.row,8):
-            if game_state.board[j][square.col - 1] == "wp" or game_state.board[j][square.col + 1] == "wp":
+            if Global.get_piece(game_state, j, square.col - 1) == "wp" or Global.get_piece(game_state, j, square.col + 1) == "wp":
                 return 0
         if Pawn.isolated(game_state, square):
             return 0
-        if game_state.board[square.row - 2][square.col - 1] == "bp" \
-            or game_state.board[square.row - 2][square.col + 1] == "bp" \
-            or game_state.board[square.row - 1][square.col] == "bp":
+        if Global.get_piece(game_state, square.row - 2, square.col - 1) == "bp" \
+            or Global.get_piece(game_state, square.row - 2, square.col + 1) == "bp" \
+            or Global.get_piece(game_state, square.row - 1, square.col) == "bp":
             return 1
         return 0
 
@@ -61,13 +63,13 @@ class Pawn:
     def doubled(game_state, square=None, param=None):
         if square is None:
             return Global.sum(game_state, Pawn.doubled)
-        if game_state.board[square.row][square.col] != "wp":
+        if Global.get_piece(game_state, square.row, square.col) != "wp":
             return 0
-        if game_state.board[square.row + 1][square.col] != "wp":
+        if Global.get_piece(game_state, square.row + 1, square.col) != "wp":
             return 0
-        if game_state.board[square.row + 1][square.col - 1] == "wp":
+        if Global.get_piece(game_state, square.row + 1, square.col - 1) == "wp":
             return 0
-        if game_state.board[square.row + 1][square.col + 1] == "wp":
+        if Global.get_piece(game_state, square.row + 1, square.col + 1) == "wp":
             return 0
         return 1
 
@@ -86,11 +88,11 @@ class Pawn:
         """
         if square is None:
             return Global.sum(game_state, Pawn.supported)
-        if game_state.board[square.row][square.col] != "wp":
+        if Global.get_piece(game_state, square.row, square.col) != "wp":
             return 0
         val = 0
-        val += 1 if game_state.board[square.row + 1][square.col - 1] == "wp" else 0
-        val += 1 if game_state.board[square.row + 1][square.col + 1] == "wp" else 0
+        val += 1 if Global.get_piece(game_state, square.row + 1, square.col - 1) == "wp" else 0
+        val += 1 if Global.get_piece(game_state, square.row + 1, square.col + 1) == "wp" else 0
         return val
 
     @staticmethod
@@ -103,7 +105,7 @@ class Pawn:
         op = Pawn.opposed(game_state, square)
         ph = Pawn.phalanx(game_state, square)
         su = Pawn.supported(game_state, square)
-        bl = 1 if game_state.board[square.row - 1][square.col] == "bp" else 0
+        bl = 1 if Global.get_piece(game_state, square.row - 1, square.col) == "bp" else 0
         r = square.row
         if r < 2 or r > 7:
             return 0
