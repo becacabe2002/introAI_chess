@@ -60,7 +60,7 @@ def find_best_move(game_state, valid_moves, chosen_depth, chosen_algorithm):
         find_move_nega_max(game_state, valid_moves, chosen_depth, game_state.white_to_move, max_depth = chosen_depth)
     else:
         find_move_nega_max_alpha_beta(game_state, valid_moves, chosen_depth, -CHECKMATE, CHECKMATE, 1 if game_state.white_to_move else -1, max_depth = chosen_depth)
-    print(counter)
+    print("counter" , counter)
     return next_move
 
 
@@ -100,7 +100,7 @@ def find_move_nega_max(game_state, valid_moves, initial_depth, turn_multiplier, 
     global next_move, counter
     counter += 1
     if initial_depth ==0:
-        return turn_multiplier + score_board(game_state)
+        return turn_multiplier * score_board(game_state)
     
     max_score =-CHECKMATE
     for move in valid_moves:
@@ -118,7 +118,7 @@ def find_move_nega_max_alpha_beta(game_state, valid_moves, initial_depth, alpha,
     global next_move, counter
     counter += 1
     if initial_depth ==0:
-        return turn_multiplier + score_board(game_state)
+        return turn_multiplier * score_board(game_state)
     
     max_score =-CHECKMATE
     for move in valid_moves:
@@ -130,7 +130,7 @@ def find_move_nega_max_alpha_beta(game_state, valid_moves, initial_depth, alpha,
             if initial_depth == max_depth:
                 next_move = move
         game_state.undo_move()
-        if max_score > alpha: #pruning happens
+        if max_score > alpha:  # pruning happens
             alpha = max_score
         if alpha >= beta:
             break

@@ -33,7 +33,7 @@ class ChessMenu:
         self.algorithm_menu.add.button("Back", pygame_menu.events.BACK)
 
         # depth menu
-        range_values = {0: '1', 1: '2', 2: '3', 3: '4'}
+        range_values = {0: '1', 1: '2', 2: '3', 3: '4', 4: '5'}
         self.depth_menu.add.range_slider('Depth', 0, list(range_values.keys()),
                                          slider_text_value_enabled=False,
                                          value_format=lambda x: range_values[x], onchange=self.set_depth)
