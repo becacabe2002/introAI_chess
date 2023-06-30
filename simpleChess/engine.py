@@ -1,3 +1,4 @@
+# coding=utf-8
 """
 Storing all the information about the current state of chess game.
 Determining valid moves at current state.
@@ -26,6 +27,7 @@ class GameState:
                               "B": self.get_bishop_moves, "Q": self.get_queen_moves, "K": self.get_king_moves}
         self.white_to_move = True
         self.move_log = []
+        self.move_count = (0,0) # count moves for white - black
         self.white_king_location = (7, 4)
         self.black_king_location = (0, 4)
         self.check_mate = False
@@ -46,6 +48,12 @@ class GameState:
         self.board[move.start_row][move.start_col] = "--"
         self.board[move.end_row][move.end_col] = move.piece_moved
         self.move_log.append(move)  # log the move so we can undo it later
+
+        if self.white_to_move:
+            self.move_count = (self.move_count[0] + 1, self.move_count[1])
+        elif not self.white_to_move:
+            self.move_count = (self.move_count[0], self.move_count[1] + 1)
+
         self.white_to_move = not self.white_to_move  # switch players
         # update king's location if moved
         if move.piece_moved == "wK":
@@ -93,6 +101,12 @@ class GameState:
             move = self.move_log.pop()
             self.board[move.start_row][move.start_col] = move.piece_moved
             self.board[move.end_row][move.end_col] = move.piece_captured
+
+            if self.white_to_move:
+                self.move_count = (self.move_count[0], self.move_count[1] - 1)
+            elif not self.white_to_move:
+                self.move_count = (self.move_count[0] - 1, self.move_count[1])
+
             self.white_to_move = not self.white_to_move  # swap players
             # update the king's position if needed
             if move.piece_moved == "wK":
@@ -534,7 +548,7 @@ class GameState:
             if not self.square_under_attack(row, col-1) and not self.square_under_attack(row, col-2):
                 moves.append(Move((row, col), (row, col-2), self.board, is_castle_move=True))
 
-            
+
 class CastleRights:
     def __init__(self, wks, bks, wqs, bqs):
         self.wks = wks
